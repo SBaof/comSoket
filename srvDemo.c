@@ -1,4 +1,17 @@
 #include "sckutil.h"
+#include <sys/wait.h>
+
+void myhandle(int sig)
+{
+    int pid = 0;
+    if(sig == SIGCHLD)
+    {
+        while((pid = waitpid(-1, NULL, WNOHANG)) > 0)
+        {
+            printf("connect cut down, pid:%d\n", pid);
+        }
+    }
+}
 
 void do_server(int conn)
 {
@@ -9,13 +22,14 @@ void do_server(int conn)
         memset(&recvbuf, 0, sizeof(recvbuf));
 
         int ret = readn(conn, &recvbuf.len, 4);
+//        printf("ret:%d\n", ret);
         if(ret == -1)
         {
             ERR_EXIT("readn");
         }
-        else if(ret < 4)
+        else if(ret<4)
         {
-            printf("client closted\n");
+            printf("client closed\n");
             break;
         }
 
@@ -25,20 +39,26 @@ void do_server(int conn)
         {
             ERR_EXIT("readn");
         }
-        else if(ret < n)
+        else if(ret < n )//|| n==0)
         {
             printf("client closed\n");
             break;
         }
 
+//        printf("1.recvbuf.len=%d\n", n);
+
         fputs(recvbuf.buf, stdout);
 
         writen(conn, &recvbuf, 4+n);
+
+        //printf("recvbuf.len=%d\n", recvbuf.len);
     }
 }
 
 int main(int argc, const char *argv[])
 {
+    signal(SIGCHLD, myhandle);
+
     if(argc < 3)
     {
         printf("Usage: ./%s ip_addr ip_port\n", argv[0]);
@@ -56,9 +76,15 @@ int main(int argc, const char *argv[])
         ERR_EXIT("socket");
     }
 
+    int on = 1;
+    if(setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) < 0)
+    {
+        ERR_EXIT("setsockopt");
+    }
+
     struct sockaddr_in srvaddr;
     srvaddr.sin_family = AF_INET;
-    srvaddr.sin_port = htonl(port);
+    srvaddr.sin_port = htons(port);
     inet_pton(AF_INET, ip, &srvaddr.sin_addr);
 
     if(bind(listenfd, (struct sockaddr*)&srvaddr, sizeof(srvaddr)) < 0)
@@ -73,13 +99,12 @@ int main(int argc, const char *argv[])
 
     int conn;
     int pid;
-    struct sockaddr_in *clnaddr;
+    struct sockaddr_in clnaddr;
     int clnaddr_len = sizeof(clnaddr);
 
     while(1)
     {
-        /*
-        conn = accept_timeout(listenfd, clnaddr, 5);
+        /*conn = accept_timeout(listenfd, clnaddr, 5);
         if(conn == -1 && errno == ETIMEDOUT)
         {
             ERR_EXIT("accept");
@@ -88,11 +113,15 @@ int main(int argc, const char *argv[])
         {
             ERR_EXIT("accept");
         }*/
+
         conn = accept(listenfd, (struct sockaddr*)&clnaddr, &clnaddr_len);
         if(connect < 0)
         {
-            ERR_EXIT("connect");
+            ERR_EXIT("accept");
         }
+
+        printf("connected with ip:%s, port:%d\n", inet_ntoa(clnaddr.sin_addr),
+                                                ntohs(clnaddr.sin_port));
 
         if((pid = fork()) == -1)
         {
@@ -102,7 +131,7 @@ int main(int argc, const char *argv[])
         {
             close(listenfd);
             do_server(conn);
-            exit(0);
+            exit(EXIT_SUCCESS);
         }
         else
         {
@@ -110,6 +139,8 @@ int main(int argc, const char *argv[])
         }
     }
 
+    close(conn);
+    close(listenfd);
     return 0;
 }
 

@@ -2,36 +2,39 @@
 
 void do_client(int sockfd)
 {
-    int ret;
-    int n;
-    packet recvbuf, sendbuf;
-
-    memset(&recvbuf, 0, sizeof(recvbuf));
+    packet sendbuf;
+    packet recvbuf;
     memset(&sendbuf, 0, sizeof(sendbuf));
+    memset(&recvbuf, 0, sizeof(recvbuf));
 
-    while(fgets(sendbuf.buf, sizeof(sendbuf.buf), stdin) != NULL)
+    int n;
+    while(fgets(sendbuf.buf, sizeof(sendbuf.buf), stdin)!=NULL)
     {
         n = strlen(sendbuf.buf);
+        //printf("strlen(sendbuf.buf): %d\n", strlen(sendbuf.buf));
+        //printf("sizeof(sendbuf.buf): %d\n", sizeof(sendbuf.buf));
         sendbuf.len = htonl(n);
         writen(sockfd, &sendbuf, 4+n);
 
-        ret = readn(sockfd, &recvbuf.len, 4);
-        if(ret < 0)
+        int ret = readn(sockfd, &recvbuf.len, 4);
+//        printf("ret:%d\n", ret);
+        if(ret == -1)
         {
             ERR_EXIT("readn");
         }
         else if(ret<4)
         {
-            printf("server closed\n");
-            break;
+            printf("client closed\n");
+            //break;
+            exit(EXIT_FAILURE);
         }
-        n = ntohl(recvbuf.len);
+
         readn(sockfd, recvbuf.buf, n);
 
+        printf("get: ");
         fputs(recvbuf.buf, stdout);
-
-        memset(&recvbuf, 0, sizeof(recvbuf));
         memset(&sendbuf, 0, sizeof(sendbuf));
+        memset(&recvbuf, 0, sizeof(recvbuf));
     }
     close(sockfd);
 }
@@ -69,6 +72,7 @@ int main(int argc, const char *argv[])
     }
 
     do_client(sockfd);
+    close(sockfd);
 
     return 0;
 }

@@ -245,7 +245,7 @@ int connect_timeout(int fd, struct sockaddr_in *addr, unsigned int wait_seconds)
 
 ssize_t readn(int fd, void *buf, size_t count)
 {
-    size_t nread = 0;
+    ssize_t nread = 0;
     size_t nleft = count;
     void *bufp = buf;
 
@@ -255,10 +255,11 @@ ssize_t readn(int fd, void *buf, size_t count)
         {
             if(errno == EINTR)
                 continue;
-            return -1;
-            if(nread == 0)
-                return (nleft - nread);
+            return -1;  
         }
+	else if(nread == 0)
+            return (nleft - nread);
+
         nleft -= nread;
         bufp += nread;
     }
