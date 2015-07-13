@@ -1,0 +1,13 @@
+.PHONY:clean all
+CC=gcc
+CFLAGS=-Wall -g
+BIN=srvRdlineDemo
+
+%.o:%.c
+	$(CC) $(FLAGS) -c $< -o $@
+
+srvRdlineDemo:srvRdlineDemo.o sckutil.o
+	$(CC) $(CFLAGS) $^ -o $@
+
+clean:
+	rm -f *.0 $(BIN)
