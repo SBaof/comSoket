@@ -32,7 +32,6 @@ void do_server(int conn)
         fputs(recvbuf, stdout);
 
         writen(conn, recvbuf, strlen(recvbuf));
-        //writen(conn, recvbuf, sizeof(recvbuf));
 
         memset(recvbuf, 0, sizeof(recvbuf));
     }

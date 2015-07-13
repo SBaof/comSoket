@@ -10,7 +10,6 @@ void do_client(int conn)
     while(fgets(sendbuf, sizeof(sendbuf), stdin) != NULL)
     {
         writen(conn, sendbuf, strlen(sendbuf));
-        //writen(conn, sendbuf, sizeof(sendbuf));
 
         ret = readline(conn, recvbuf, sizeof(recvbuf));
         if(ret == -1)

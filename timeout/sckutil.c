@@ -255,7 +255,7 @@ ssize_t readn(int fd, void *buf, size_t count)
         {
             if(errno == EINTR)
                 continue;
-            return -1;  
+            return -1;
         }
 	else if(nread == 0)
             return (nleft - nread);
@@ -333,7 +333,7 @@ ssize_t readline(int sockfd,void *buf, size_t maxlen)
                 {
                     exit(EXIT_FAILURE);
                 }
-		        return ret;
+		return ret;
             }
         }
 
