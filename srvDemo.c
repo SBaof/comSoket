@@ -22,7 +22,6 @@ void do_server(int conn)
         memset(&recvbuf, 0, sizeof(recvbuf));
 
         int ret = readn(conn, &recvbuf.len, 4);
-//        printf("ret:%d\n", ret);
         if(ret == -1)
         {
             ERR_EXIT("readn");
@@ -39,7 +38,7 @@ void do_server(int conn)
         {
             ERR_EXIT("readn");
         }
-        else if(ret < n )//|| n==0)
+        else if(ret < n )
         {
             printf("client closed\n");
             break;
