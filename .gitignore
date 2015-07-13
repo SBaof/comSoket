@@ -21,3 +21,8 @@
 *.exe
 *.out
 *.apphello
+#sth
+*#
+*.c~
+*~
+.#*
