@@ -16,6 +16,9 @@
 #include <string.h>
 #include <stdlib.h>
 
+#define SA struct sockaddr
+#define SAIN struct sockaddr_in
+
 #define ERR_EXIT(m) \
     do \
     { \

@@ -288,3 +288,67 @@ ssize_t writen(int fd, void *buf, size_t count)
     }
     return count;
 }
+
+ssize_t recv_peek(int sockfd, void *buf, size_t len)
+{
+    int ret = 0;
+    while(1)
+    {
+        ret = recv(sockfd, buf, len, MSG_PEEK);
+        if(ret == -1 && errno == EINTR)
+        {
+            continue;
+        }
+        return ret;
+    }
+}
+
+ssize_t readline(int sockfd,void *buf, size_t maxlen)
+{
+    int ret = 0;
+    int nread;
+    int nleft = maxlen;
+    char *bufp = buf;
+
+    while(1)
+    {
+        ret = recv_peek(sockfd, bufp, nleft);
+        if(ret < 0)
+        {
+            return ret;
+        }
+        else if(ret == 0)
+        {
+            return ret;
+        }
+
+        nread = ret;
+        int i = 0;
+        for(i=0; i<nread; i++)
+        {
+            if(bufp[i] == '\n')
+            {
+                ret = readn(sockfd, bufp, i+1);
+                if(ret != i+1)
+                {
+                    exit(EXIT_FAILURE);
+                }
+		return ret;
+            }
+        }
+
+        if(nread > nleft)
+        {
+            exit(EXIT_FAILURE);
+        }
+
+        nleft -= nread;
+        ret = readn(sockfd, bufp, nread);
+        if(ret != nread)
+        {
+            exit(EXIT_FAILURE);
+        }
+        bufp += nread;
+    }
+    return -1;
+}
