@@ -68,7 +68,7 @@ int main(int argc, const char *argv[])
     int port = atoi(argv[2]);
 
     int listenfd;
-    int ret = 0;
+    //int ret = 0;
 
     if((listenfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {

@@ -62,7 +62,7 @@ int main(int argc, const char *argv[])
     srvaddr.sin_family = AF_INET;
     srvaddr.sin_port = htons(port);
     inet_pton(AF_INET, ip, &srvaddr.sin_addr);
-    int srvaddr_len = sizeof(srvaddr);
+//    int srvaddr_len = sizeof(srvaddr);
 
     ret = connect(sockfd, (struct sockaddr *)&srvaddr, sizeof(srvaddr));
     //printf("ret:%d\n", ret);
