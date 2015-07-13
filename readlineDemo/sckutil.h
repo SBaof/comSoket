@@ -19,6 +19,8 @@
 #define SA struct sockaddr
 #define SAIN struct sockaddr_in
 
+#define MAXFD(a,b) (a>b)?(a):(b)
+
 #define ERR_EXIT(m) \
     do \
     { \
