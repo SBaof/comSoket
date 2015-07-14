@@ -82,6 +82,9 @@ int main(int argc, const char *argv[])
             ERR_EXIT("accept");
         }
 
+        printf("connected with:ip:%s, port:%d\n", inet_ntoa(clnaddr.sin_addr),
+                htons(clnaddr.sin_port));
+
         pid = fork();
         if(pid == -1)
         {

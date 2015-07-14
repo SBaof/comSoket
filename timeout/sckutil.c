@@ -179,15 +179,15 @@ void deactive_nonblock(int fd)
  * 相当于通过select管理中心去监控sockfd的状态
  * 这样会大大提高我们的产品质量
  *
- * 注意：select机制监控到conn可度，并不能代表连接可用
+ * 注意：select机制监控到conn可读，并不能代表连接可用
  * 还需要进一步的判断（造成可读有几种情况：1.真正建立起连接；2.建立失败）
  * 通过int sockoptret = getsockopt(fd, SOL_SOCKET, SO_ERROR, &err, &socklen)
  * 做一个容错即可
  */
-int connect_timeout(int fd, struct sockaddr_in *addr, unsigned int wait_seconds)
+int connect_timeout(int fd, struct sockaddr *addr, socklen_t addrlen, unsigned int wait_seconds)
 {
     int ret;
-    socklen_t addrlen = sizeof(struct sockaddr_in);
+    //socklen_t addrlen = sizeof(struct sockaddr_in);
 
     if(wait_seconds > 0)
         active_nonblock(fd);
