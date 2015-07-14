@@ -35,6 +35,17 @@ typedef struct packet_
     char buf[1024];
 }packet;
 
+typedef struct args_
+{
+    long arg1;
+    long arg2;
+}args;
+
+typedef struct result_
+{
+    long sum;
+}result;
+
 void activate_nonnblock(int fd);
 void deactivate_nonblock(int fd);
 
