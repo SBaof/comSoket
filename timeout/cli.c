@@ -9,7 +9,8 @@ int main(int argc, const char *argv[])
         ERR_EXIT("socket");
     }
 
-    SAIN addr;
+    //SAIN addr;
+    struct sockaddr_in addr;
     addr.sin_family = AF_INET;
     addr.sin_port = htons(8888);
     inet_pton(AF_INET, ip, &addr.sin_addr);
@@ -17,8 +18,8 @@ int main(int argc, const char *argv[])
     socklen_t len = sizeof(addr);
 
     int ret = 0;
-    //ret = connect_timeout(sock, (SA*)&addr, len, 5);
-    ret = connect(sock, (SA *)&addr, sizeof(addr));
+    ret = connect_timeout(sock, (struct sockaddr*)&addr, len, 5);
+    //ret = connect(sock, (SA *)&addr, sizeof(addr));
     if(ret == -1 && errno == ETIMEDOUT)
     {
         printf("commect timeout...\n");
@@ -35,5 +36,7 @@ int main(int argc, const char *argv[])
         ERR_EXIT("getsockname");
 
     printf("ip:%s,port:%d\n", inet_ntoa(localaddr.sin_addr), ntohs(localaddr.sin_port));
+
+    close(sock);
     return 0;
 }
